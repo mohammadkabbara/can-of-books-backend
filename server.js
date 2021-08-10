@@ -1,24 +1,50 @@
 'use strict';
 
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const jwksClient = require('jwks-rsa');
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
+const mongoose = require('mongoose');
+const UserModel = require('./module/user.js');
 
-const PORT = process.env.PORT || 3001;
 
-app.get('/test', (request, response) => {
+const PORT = process.env.PORT;
 
-  // TODO: 
-  // STEP 1: get the jwt from the headers
-  // STEP 2. use the jsonwebtoken library to verify that it is a valid jwt
-  // jsonwebtoken dock - https://www.npmjs.com/package/jsonwebtoken
-  // STEP 3: to prove that everything is working correctly, send the opened jwt back to the front-end
 
+
+mongoose.connect('mongodb://localhost:27017/bestBooks',
+    { useNewUrlParser: true, useUnifiedTopology: true });
+
+
+app.get('/', homepage);
+function homepage(req, res) {
+    res.send('Hello ');
+}
+// http://localhost:3001/books?email=mohammadkabbara40@gmail.com
+app.get('/books', getBooks);
+
+
+function getBooks(req, res) {
+    const { email } = req.query;
+    UserModel.find({ email: email },
+
+        function (err, data) {
+            if (err) res.send('error');
+            else {
+                // console.log(data);
+              res.send(data[0].books)
+            }
+        });
+    // console.log('email', email);
+    // console.log('email2',email2);
+
+}
+
+
+
+
+app.listen(PORT, () => {
+    console.log(`Listening on PORT ${PORT}`)
 })
-
-app.listen(PORT, () => console.log(`listening on ${PORT}`));
